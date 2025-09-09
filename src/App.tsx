@@ -11,6 +11,14 @@ import { useAuthStore } from "@/store/auth";
 
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
+import Schools from "./pages/Schools";
+import Students from "./pages/Students";
+import Vendors from "./pages/Vendors";
+import POSDevices from "./pages/POSDevices";
+import Wristbands from "./pages/Wristbands";
+import Parents from "./pages/Parents";
+import Analytics from "./pages/Analytics";
+import Transactions from "./pages/Transactions";
 import Unauthorized from "./pages/Unauthorized";
 import NotFound from "./pages/NotFound";
 
@@ -46,7 +54,14 @@ const App = () => {
                 </ProtectedRoute>
               }>
                 <Route path="dashboard" element={<Dashboard />} />
-                {/* Add more protected routes here */}
+                <Route path="schools/*" element={<Schools />} />
+                <Route path="students/*" element={<Students />} />
+                <Route path="vendors" element={<Vendors />} />
+                <Route path="pos-devices/*" element={<POSDevices />} />
+                <Route path="wristbands/*" element={<Wristbands />} />
+                <Route path="parents" element={<Parents />} />
+                <Route path="analytics" element={<Analytics />} />
+                <Route path="transactions" element={<Transactions />} />
               </Route>
 
               {/* 404 Route */}
