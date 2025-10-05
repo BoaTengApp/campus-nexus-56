@@ -12,6 +12,7 @@ import { useAuthStore } from "@/store/auth";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import Schools from "./pages/Schools";
+import SchoolDetail from "./pages/SchoolDetail";
 import Students from "./pages/Students";
 import Vendors from "./pages/Vendors";
 import POSDevices from "./pages/POSDevices";
@@ -54,7 +55,8 @@ const App = () => {
                 </ProtectedRoute>
               }>
                 <Route path="dashboard" element={<Dashboard />} />
-                <Route path="schools/*" element={<Schools />} />
+                <Route path="schools" element={<Schools />} />
+                <Route path="schools/:id" element={<SchoolDetail />} />
                 <Route path="students/*" element={<Students />} />
                 <Route path="vendors" element={<Vendors />} />
                 <Route path="pos-devices/*" element={<POSDevices />} />

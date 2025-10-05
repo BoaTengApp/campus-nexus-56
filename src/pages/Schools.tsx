@@ -1,6 +1,7 @@
 import * as React from "react";
+import { useNavigate } from "react-router-dom";
 import { ColumnDef } from "@tanstack/react-table";
-import { MoreHorizontal, Edit, Trash2, Eye, Building2, Users, Activity } from "lucide-react";
+import { MoreHorizontal, Edit, Trash2, Eye, Building2, Upload, Power } from "lucide-react";
 import { motion } from "framer-motion";
 
 import { Button } from "@/components/ui/button";
@@ -18,6 +19,10 @@ import { PageHeader } from "@/components/shared/page-header";
 import { FiltersBar } from "@/components/shared/filters-bar";
 import { useAuthStore } from "@/store/auth";
 import { School } from "@/lib/types";
+import { useToast } from "@/hooks/use-toast";
+import { SchoolFormDialog } from "@/components/schools/school-form-dialog";
+import { BulkUploadDialog } from "@/components/schools/bulk-upload-dialog";
+import { Switch } from "@/components/ui/switch";
 
 // Mock data - replace with actual API calls
 const mockSchools: School[] = [
@@ -54,31 +59,55 @@ const mockSchools: School[] = [
 ];
 
 const Schools = () => {
+  const navigate = useNavigate();
   const { hasPermission } = useAuthStore();
+  const { toast } = useToast();
   const [schools, setSchools] = React.useState<School[]>(mockSchools);
   const [search, setSearch] = React.useState("");
   const [statusFilter, setStatusFilter] = React.useState("");
   const [dateFrom, setDateFrom] = React.useState<Date>();
   const [dateTo, setDateTo] = React.useState<Date>();
+  const [showAddDialog, setShowAddDialog] = React.useState(false);
+  const [showBulkDialog, setShowBulkDialog] = React.useState(false);
+  const [editingSchool, setEditingSchool] = React.useState<School | undefined>();
 
   const handleAdd = () => {
-    console.log("Add new school");
-    // Navigate to add school page
+    setEditingSchool(undefined);
+    setShowAddDialog(true);
+  };
+
+  const handleBulkUpload = () => {
+    setShowBulkDialog(true);
   };
 
   const handleEdit = (school: School) => {
-    console.log("Edit school:", school);
-    // Navigate to edit school page
+    setEditingSchool(school);
+    setShowAddDialog(true);
   };
 
   const handleDelete = (school: School) => {
     console.log("Delete school:", school);
     // Show confirmation dialog and delete
+    toast({
+      title: "School deleted",
+      description: `${school.name} has been deleted successfully.`,
+    });
   };
 
   const handleView = (school: School) => {
-    console.log("View school:", school);
-    // Navigate to school details page
+    navigate(`/schools/${school.id}`);
+  };
+
+  const handleStatusToggle = (school: School, checked: boolean) => {
+    const newStatus = checked ? "ACTIVE" : "INACTIVE";
+    setSchools(schools.map(s => 
+      s.id === school.id ? { ...s, status: newStatus } : s
+    ));
+    
+    toast({
+      title: `School ${checked ? "activated" : "deactivated"}`,
+      description: `${school.name} has been ${checked ? "activated" : "deactivated"} successfully.`,
+    });
   };
 
   const handleExport = () => {
@@ -127,18 +156,32 @@ const Schools = () => {
       accessorKey: "status",
       header: "Status",
       cell: ({ row }) => {
-        const status = row.getValue("status") as string;
+        const school = row.original;
+        const isActive = school.status === "ACTIVE";
+        
+        if (!hasPermission("SCHOOL_UPDATE")) {
+          return (
+            <Badge
+              variant={isActive ? "default" : "secondary"}
+              className={
+                isActive
+                  ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
+                  : "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300"
+              }
+            >
+              {school.status}
+            </Badge>
+          );
+        }
+
         return (
-          <Badge
-            variant={status === "ACTIVE" ? "default" : "secondary"}
-            className={
-              status === "ACTIVE"
-                ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
-                : "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300"
-            }
-          >
-            {status}
-          </Badge>
+          <div className="flex items-center gap-2">
+            <Switch
+              checked={isActive}
+              onCheckedChange={(checked) => handleStatusToggle(school, checked)}
+            />
+            <span className="text-sm">{isActive ? "Active" : "Inactive"}</span>
+          </div>
         );
       },
     },
@@ -224,10 +267,16 @@ const Schools = () => {
         badge={`${filteredSchools.length} schools`}
       >
         {hasPermission("SCHOOL_CREATE") && (
-          <Button onClick={handleAdd} className="bg-gradient-primary hover:shadow-glow">
-            <Building2 className="mr-2 h-4 w-4" />
-            Add School
-          </Button>
+          <div className="flex gap-2">
+            <Button onClick={handleBulkUpload} variant="outline">
+              <Upload className="mr-2 h-4 w-4" />
+              Bulk Upload
+            </Button>
+            <Button onClick={handleAdd} className="bg-gradient-primary hover:shadow-glow">
+              <Building2 className="mr-2 h-4 w-4" />
+              Add School
+            </Button>
+          </div>
         )}
       </PageHeader>
 
@@ -262,6 +311,26 @@ const Schools = () => {
           showSearch={false} // We're using custom FiltersBar
         />
       </motion.div>
+
+      {/* Dialogs */}
+      <SchoolFormDialog
+        open={showAddDialog}
+        onOpenChange={setShowAddDialog}
+        school={editingSchool}
+        onSuccess={() => {
+          // Refresh schools list
+          console.log("School saved successfully");
+        }}
+      />
+
+      <BulkUploadDialog
+        open={showBulkDialog}
+        onOpenChange={setShowBulkDialog}
+        onSuccess={() => {
+          // Refresh schools list
+          console.log("Bulk upload completed");
+        }}
+      />
     </div>
   );
 };
