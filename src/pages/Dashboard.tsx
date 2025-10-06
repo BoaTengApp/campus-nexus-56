@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
 import {
   Building2,
@@ -8,12 +9,16 @@ import {
   Activity,
   DollarSign,
   Watch,
+  Calendar,
+  ArrowUpRight,
+  ArrowDownRight,
 } from "lucide-react";
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useAuthStore } from "@/store/auth";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface StatCard {
   title: string;
@@ -34,6 +39,7 @@ interface RecentActivity {
 
 const Dashboard = () => {
   const { user } = useAuthStore();
+  const [dateRange, setDateRange] = useState("7days");
 
   // Mock data - replace with actual API calls
   const stats: StatCard[] = [
@@ -147,6 +153,19 @@ const Dashboard = () => {
             </p>
           </div>
           <div className="flex items-center gap-3">
+            <Select value={dateRange} onValueChange={setDateRange}>
+              <SelectTrigger className="w-[180px]">
+                <Calendar className="h-4 w-4" />
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="today">Today</SelectItem>
+                <SelectItem value="7days">Last 7 days</SelectItem>
+                <SelectItem value="30days">Last 30 days</SelectItem>
+                <SelectItem value="90days">Last 90 days</SelectItem>
+                <SelectItem value="custom">Custom Range</SelectItem>
+              </SelectContent>
+            </Select>
             <Badge variant="outline" className="text-sm">
               {user?.userType.replace('_', ' ')}
             </Badge>
@@ -200,6 +219,62 @@ const Dashboard = () => {
             </Card>
           </motion.div>
         ))}
+      </motion.div>
+
+      {/* Transaction Flow Visualization */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.5 }}
+      >
+        <Card>
+          <CardHeader>
+            <CardTitle>Transaction Flow</CardTitle>
+            <CardDescription>Money flow across the system</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between p-4 rounded-lg bg-gradient-subtle">
+                <div className="flex items-center gap-3">
+                  <div className="h-12 w-12 rounded-full bg-success/10 flex items-center justify-center">
+                    <ArrowDownRight className="h-6 w-6 text-success" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium">Total Income</p>
+                    <p className="text-2xl font-bold text-success">$45,234</p>
+                  </div>
+                </div>
+                <Badge className="bg-success/10 text-success">+12%</Badge>
+              </div>
+
+              <div className="flex items-center justify-between p-4 rounded-lg bg-gradient-subtle">
+                <div className="flex items-center gap-3">
+                  <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
+                    <TrendingUp className="h-6 w-6 text-primary" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium">Active Transactions</p>
+                    <p className="text-2xl font-bold">1,245</p>
+                  </div>
+                </div>
+                <Badge variant="secondary">This {dateRange}</Badge>
+              </div>
+
+              <div className="flex items-center justify-between p-4 rounded-lg bg-gradient-subtle">
+                <div className="flex items-center gap-3">
+                  <div className="h-12 w-12 rounded-full bg-warning/10 flex items-center justify-center">
+                    <ArrowUpRight className="h-6 w-6 text-warning" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium">Avg. Transaction</p>
+                    <p className="text-2xl font-bold">$36.35</p>
+                  </div>
+                </div>
+                <Badge className="bg-warning/10 text-warning">-2%</Badge>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </motion.div>
 
       {/* Content Grid */}

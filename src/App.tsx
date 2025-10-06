@@ -20,6 +20,11 @@ import Wristbands from "./pages/Wristbands";
 import Parents from "./pages/Parents";
 import Analytics from "./pages/Analytics";
 import Transactions from "./pages/Transactions";
+import Users from "./pages/Users";
+import Roles from "./pages/Roles";
+import Settings from "./pages/Settings";
+import TermsConditions from "./pages/TermsConditions";
+import AssignStudents from "./pages/AssignStudents";
 import Unauthorized from "./pages/Unauthorized";
 import NotFound from "./pages/NotFound";
 
@@ -64,6 +69,11 @@ const App = () => {
                 <Route path="parents" element={<Parents />} />
                 <Route path="analytics" element={<Analytics />} />
                 <Route path="transactions" element={<Transactions />} />
+                <Route path="users" element={<Users />} />
+                <Route path="roles" element={<Roles />} />
+                <Route path="settings" element={<Settings />} />
+                <Route path="terms" element={<TermsConditions />} />
+                <Route path="assign-students" element={<AssignStudents />} />
               </Route>
 
               {/* 404 Route */}
