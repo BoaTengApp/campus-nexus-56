@@ -13,12 +13,17 @@ export const ProtectedRoute = ({
   permissions = [], 
   requireAll = false 
 }: ProtectedRouteProps) => {
-  const { isAuthenticated, hasPermission, hasAllPermissions, hasAnyPermission } = useAuthStore();
+  const { isAuthenticated, firstTimeLogin, hasPermission, hasAllPermissions, hasAnyPermission } = useAuthStore();
   const location = useLocation();
 
   // Check if user is authenticated
   if (!isAuthenticated) {
     return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+
+  // Redirect to change password if first time login
+  if (firstTimeLogin) {
+    return <Navigate to="/change-password" replace />;
   }
 
   // Check permissions if specified

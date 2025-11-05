@@ -8,10 +8,13 @@ import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { useAuthStore } from "@/store/auth";
 
 const Login = () => {
-  const { isAuthenticated } = useAuthStore();
+  const { isAuthenticated, firstTimeLogin } = useAuthStore();
 
   // Redirect if already authenticated
   if (isAuthenticated) {
+    if (firstTimeLogin) {
+      return <Navigate to="/change-password" replace />;
+    }
     return <Navigate to="/dashboard" replace />;
   }
 

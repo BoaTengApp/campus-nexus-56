@@ -10,6 +10,7 @@ import { AppLayout } from "@/components/layout/app-layout";
 import { useAuthStore } from "@/store/auth";
 
 import Login from "./pages/Login";
+import ChangePassword from "./pages/ChangePassword";
 import Dashboard from "./pages/Dashboard";
 import Schools from "./pages/Schools";
 import SchoolDetail from "./pages/SchoolDetail";
@@ -31,7 +32,7 @@ import NotFound from "./pages/NotFound";
 const queryClient = new QueryClient();
 
 const App = () => {
-  const { isAuthenticated } = useAuthStore();
+  const { isAuthenticated, firstTimeLogin } = useAuthStore();
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -43,12 +44,17 @@ const App = () => {
             <Routes>
               {/* Public Routes */}
               <Route path="/login" element={<Login />} />
+              <Route path="/change-password" element={<ChangePassword />} />
               <Route path="/unauthorized" element={<Unauthorized />} />
               
               {/* Protected Routes */}
               <Route path="/" element={
                 isAuthenticated ? (
-                  <Navigate to="/dashboard" replace />
+                  firstTimeLogin ? (
+                    <Navigate to="/change-password" replace />
+                  ) : (
+                    <Navigate to="/dashboard" replace />
+                  )
                 ) : (
                   <Navigate to="/login" replace />
                 )

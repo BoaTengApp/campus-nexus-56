@@ -49,7 +49,7 @@ export const LoginForm = () => {
           expiresOn: new Date(Date.now() + 3600000).toISOString(),
         },
         refreshToken: "mock-refresh-token",
-        firstTimeLogin: false,
+        firstTimeLogin: true, // Set to true to test password change flow
         user: {
           id: 1,
           email: data.email,
